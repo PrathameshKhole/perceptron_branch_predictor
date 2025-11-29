@@ -1130,3 +1130,19 @@ class MultiperspectivePerceptronTAGE8KB(MultiperspectivePerceptronTAGE):
     tage = MPP_TAGE_8KB()
     loop_predictor = MPP_LoopPredictor_8KB()
     statistical_corrector = MPP_StatisticalCorrector_8KB()
+
+# Add this class definition (after other predictor classes)
+
+class PerceptronLocalBP(BranchPredictor):
+    type = 'PerceptronLocalBP'
+    cxx_class = 'gem5::branch_prediction::PerceptronLocalBP'
+    cxx_header = 'cpu/pred/perceptron_local.hh'
+
+    perceptronTableSize = Param.Unsigned(4096,
+        "Number of perceptrons in the table (must be power of 2)")
+    localHistoryLength = Param.Unsigned(62,
+        "Length of local history in bits")
+    threshold = Param.Int(134,
+        "Training threshold")
+    weightMax = Param.Int(127, "Maximum weight value")
+    weightMin = Param.Int(-128, "Minimum weight value")

@@ -1,4 +1,4 @@
-# CSE 220 – Perceptron-Based Branch Prediction in gem5 (X86 Only)
+# CSE 220 – Perceptron-Based Branch Prediction in gem5
 
 This project adds two perceptron-based branch predictors to gem5 and compares them against the built-in predictors on a small X86 benchmark suite. Scripts are included to run predictors, extract statistics, export CSV summaries, and generate visualizations.
 
@@ -33,7 +33,7 @@ SCons configuration:
 
 ---
 
-## 2. Building gem5 (X86)
+## 2. Building gem5 for X86
 
 From the gem5 root:
 
@@ -49,7 +49,7 @@ HybridPerceptronBP
 
 ---
 
-## 3. Simple Tests Using X86 Hello-World
+## 3. Simple Tests Using baseline Hello-World
 
 Runs use:  
 tests/test-progs/hello/bin/x86/linux/hello
@@ -89,80 +89,7 @@ m5out/hybrid/stats.txt
 
 ---
 
-## 4. Benchmark Directory Layout (X86)
-
-Realistic benchmarks are stored under benchmark_results/ with the following layout:
-
-benchmark_results/  
-  X86/  
-    LocalBP/  
-      binary_search/  
-        stats.txt  
-      branch_loop/  
-        stats.txt  
-      linked_list/  
-        stats.txt  
-      matrix/  
-        stats.txt  
-      quicksort/  
-        stats.txt  
-      hello/  
-        stats.txt  
-    TournamentBP/  
-      ...  
-    LTAGE/  
-      ...  
-    PerceptronLocalBP/  
-      ...  
-    HybridPerceptronBP/  
-      ...
-
-Each leaf directory corresponds to a (predictor, benchmark) pair and contains the stats.txt gem5 produced.
-
-Example: running quicksort with HybridPerceptronBP:
-
-./build/X86/gem5.opt \
-  -d benchmark_results/X86/HybridPerceptronBP/quicksort \
-  configs/deprecated/example/se.py \
-  --cpu-type=O3CPU --caches --l2cache \
-  --bp-type=HybridPerceptronBP \
-  -c path/to/quicksort_binary
-
-Repeat the same benchmark path for the other predictors (LocalBP, TournamentBP, LTAGE, PerceptronLocalBP) so comparisons are fair.
-
----
-
-## 5. Text-mode Analysis + CSV Export
-
-Once benchmark_results/ is populated, run:
-
-bash analyze_benchmarks.sh
-
-This script:
-
-Prints a table like:
-
-Benchmark            Predictor       Branches     Mispreds     Accuracy   MPKI  
---------------------------------------------------------------------------------  
-binary_search        LocalBP         ...  
-binary_search        TournamentBP    ...  
-...
-
-Prints average MPKI per predictor.
-
-Exports a CSV:
-
-benchmark_results/results.csv
-
-CSV columns:
-
-arch,predictor,benchmark,branches,mispredictions,instructions,ticks,accuracy,mpki
-
-arch is always X86.
-
----
-
-## 6. Plotting and Visualization (X86)
+## 4. Plotting and Visualization
 
 Dependencies:
 

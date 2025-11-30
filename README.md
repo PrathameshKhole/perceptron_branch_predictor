@@ -139,33 +139,3 @@ hello_vs_realistic_accuracy_x86.png
 
 These compare each predictor on hello-world vs realistic workloads.
 
----
-
-## Optional: CPU-Configuration Comparison Mode
-
-If results are organized by CPU config, layout:
-
-benchmark_results/  
-  X86/  
-    O3_default/  
-      LocalBP/binary_search/stats.txt  
-      LocalBP/quicksort/stats.txt  
-      HybridPerceptronBP/quicksort/stats.txt  
-      ...  
-    O3_wide/  
-    O3_narrow/  
-    Minor_inorder/
-
-Run:
-
-python3 plot_results.py \
-  --dir benchmark_results \
-  --output plots_cpu \
-  --cpu-compare
-
-Generated images:
-
-cpu_comparison_mpki.png  
-cpu_comparison_accuracy.png  
-cpu_impact_heatmap.png  
-predictor_ranking_<cpu>.png

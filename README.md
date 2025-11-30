@@ -1,99 +1,244 @@
-# The gem5 Simulator
+# CSE 220 – Perceptron-Based Branch Prediction in gem5 (X86 Only)
 
-This is the repository for the gem5 simulator. It contains the full source code
-for the simulator and all tests and regressions.
+This project adds two perceptron-based branch predictors to gem5 and compares them against the built-in predictors on a small X86 benchmark suite. Scripts are included to run predictors, extract statistics, export CSV summaries, and generate visualizations.
 
-The gem5 simulator is a modular platform for computer-system architecture
-research, encompassing system-level architecture as well as processor
-microarchitecture. It is primarily used to evaluate new hardware designs,
-system software changes, and compile-time and run-time system optimizations.
+Predictors compared (X86):
+- LocalBP
+- TournamentBP
+- LTAGE
+- PerceptronLocalBP
+- HybridPerceptronBP
 
-The main website can be found at <http://www.gem5.org>.
+---
 
-## Testing status
+## 1. Code Added
 
-**Note**: These regard tests run on the develop branch of gem5:
-<https://github.com/gem5/gem5/tree/develop>.
+Predictor C++ files:
+- src/cpu/pred/perceptron_local.hh
+- src/cpu/pred/perceptron_local.cc
+- src/cpu/pred/hybrid_perceptron.hh
+- src/cpu/pred/hybrid_perceptron.cc
 
-[![Daily Tests](https://github.com/gem5/gem5/actions/workflows/daily-tests.yaml/badge.svg?branch=develop)](https://github.com/gem5/gem5/actions/workflows/daily-tests.yaml)
-[![Weekly Tests](https://github.com/gem5/gem5/actions/workflows/weekly-tests.yaml/badge.svg?branch=develop)](https://github.com/gem5/gem5/actions/workflows/weekly-tests.yaml)
-[![Compiler Tests](https://github.com/gem5/gem5/actions/workflows/compiler-tests.yaml/badge.svg?branch=develop)](https://github.com/gem5/gem5/actions/workflows/compiler-tests.yaml)
+SimObject registration:
+- src/cpu/pred/BranchPredictor.py  
+  adds:
+  - PerceptronLocalBP
+  - HybridPerceptronBP
 
-## Getting started
+SCons configuration:
+- src/cpu/pred/SConscript  
+  must contain:
+  - Source('perceptron_local.cc')
+  - Source('hybrid_perceptron.cc')
 
-A good starting point is <http://www.gem5.org/about>, and for
-more information about building the simulator and getting started
-please see <http://www.gem5.org/documentation> and
-<http://www.gem5.org/documentation/learning_gem5/introduction>.
+---
 
-## Building gem5
+## 2. Building gem5 (X86)
 
-To build gem5, you will need the following software: g++ or clang,
-Python (gem5 links in the Python interpreter), SCons, zlib, m4, and lastly
-protobuf if you want trace capture and playback support. Please see
-<http://www.gem5.org/documentation/general_docs/building> for more details
-concerning the minimum versions of these tools.
+From the gem5 root:
 
-Once you have all dependencies resolved, execute
-`scons build/ALL/gem5.opt` to build an optimized version of the gem5 binary
-(`gem5.opt`) containing all gem5 ISAs. If you only wish to compile gem5 to
-include a single ISA, you can replace `ALL` with the name of the ISA. Valid
-options include `ARM`, `NULL`, `MIPS`, `POWER`, `RISCV`, `SPARC`, and `X86`
-The complete list of options can be found in the build_opts directory.
+scons build/X86/gem5.opt -j6
 
-See https://www.gem5.org/documentation/general_docs/building for more
-information on building gem5.
+Predictor names accepted by --bp-type:
 
-## The Source Tree
+LocalBP  
+TournamentBP  
+LTAGE  
+PerceptronLocalBP  
+HybridPerceptronBP
 
-The main source tree includes these subdirectories:
+---
 
-* build_opts: pre-made default configurations for gem5
-* build_tools: tools used internally by gem5's build process.
-* configs: example simulation configuration scripts
-* ext: less-common external packages needed to build gem5
-* include: include files for use in other programs
-* site_scons: modular components of the build system
-* src: source code of the gem5 simulator. The C++ source, Python wrappers, and Python standard library are found in this directory.
-* system: source for some optional system software for simulated systems
-* tests: regression tests
-* util: useful utility programs and files
+## 3. Simple Tests Using X86 Hello-World
 
-## gem5 Resources
+Runs use:  
+tests/test-progs/hello/bin/x86/linux/hello
 
-To run full-system simulations, you may need compiled system firmware, kernel
-binaries and one or more disk images, depending on gem5's configuration and
-what type of workload you're trying to run. Many of these resources can be
-obtained from <https://resources.gem5.org>.
+./build/X86/gem5.opt -d m5out/local \
+  configs/deprecated/example/se.py \
+  --cpu-type=O3CPU --caches --l2cache --bp-type=LocalBP \
+  -c tests/test-progs/hello/bin/x86/linux/hello
 
-More information on gem5 Resources can be found at
-<https://www.gem5.org/documentation/general_docs/gem5_resources/>.
+./build/X86/gem5.opt -d m5out/tournament \
+  configs/deprecated/example/se.py \
+  --cpu-type=O3CPU --caches --l2cache --bp-type=TournamentBP \
+  -c tests/test-progs/hello/bin/x86/linux/hello
 
-## Getting Help, Reporting bugs, and Requesting Features
+./build/X86/gem5.opt -d m5out/ltage \
+  configs/deprecated/example/se.py \
+  --cpu-type=O3CPU --caches --l2cache --bp-type=LTAGE \
+  -c tests/test-progs/hello/bin/x86/linux/hello
 
-We provide a variety of channels for users and developers to get help, report
-bugs, requests features, or engage in community discussions. Below
-are a few of the most common we recommend using.
+./build/X86/gem5.opt -d m5out/perceptron \
+  configs/deprecated/example/se.py \
+  --cpu-type=O3CPU --caches --l2cache --bp-type=PerceptronLocalBP \
+  -c tests/test-progs/hello/bin/x86/linux/hello
 
-* **GitHub Discussions**: A GitHub Discussions page. This can be used to start
-discussions or ask questions. Available at
-<https://github.com/orgs/gem5/discussions>.
-* **GitHub Issues**: A GitHub Issues page for reporting bugs or requesting
-features. Available at <https://github.com/gem5/gem5/issues>.
-* **Jira Issue Tracker**: A Jira Issue Tracker for reporting bugs or requesting
-features. Available at <https://gem5.atlassian.net/>.
-* **Slack**: A Slack server with a variety of channels for the gem5 community
-to engage in a variety of discussions. Please visit
-<https://www.gem5.org/join-slack> to join.
-* **gem5-users@gem5.org**: A mailing list for users of gem5 to ask questions
-or start discussions. To join the mailing list please visit
-<https://www.gem5.org/mailing_lists>.
-* **gem5-dev@gem5.org**: A mailing list for developers of gem5 to ask questions
-or start discussions. To join the mailing list please visit
-<https://www.gem5.org/mailing_lists>.
+./build/X86/gem5.opt -d m5out/hybrid \
+  configs/deprecated/example/se.py \
+  --cpu-type=O3CPU --caches --l2cache --bp-type=HybridPerceptronBP \
+  -c tests/test-progs/hello/bin/x86/linux/hello
 
-## Contributing to gem5
+Outputs:
 
-We hope you enjoy using gem5. When appropriate we advise sharing your
-contributions to the project. <https://www.gem5.org/contributing> can help you
-get started. Additional information can be found in the CONTRIBUTING.md file.
+m5out/local/stats.txt  
+m5out/tournament/stats.txt  
+m5out/ltage/stats.txt  
+m5out/perceptron/stats.txt  
+m5out/hybrid/stats.txt
+
+---
+
+## 4. Benchmark Directory Layout (X86)
+
+Realistic benchmarks are stored under benchmark_results/ with the following layout:
+
+benchmark_results/  
+  X86/  
+    LocalBP/  
+      binary_search/  
+        stats.txt  
+      branch_loop/  
+        stats.txt  
+      linked_list/  
+        stats.txt  
+      matrix/  
+        stats.txt  
+      quicksort/  
+        stats.txt  
+      hello/  
+        stats.txt  
+    TournamentBP/  
+      ...  
+    LTAGE/  
+      ...  
+    PerceptronLocalBP/  
+      ...  
+    HybridPerceptronBP/  
+      ...
+
+Each leaf directory corresponds to a (predictor, benchmark) pair and contains the stats.txt gem5 produced.
+
+Example: running quicksort with HybridPerceptronBP:
+
+./build/X86/gem5.opt \
+  -d benchmark_results/X86/HybridPerceptronBP/quicksort \
+  configs/deprecated/example/se.py \
+  --cpu-type=O3CPU --caches --l2cache \
+  --bp-type=HybridPerceptronBP \
+  -c path/to/quicksort_binary
+
+Repeat the same benchmark path for the other predictors (LocalBP, TournamentBP, LTAGE, PerceptronLocalBP) so comparisons are fair.
+
+---
+
+## 5. Text-mode Analysis + CSV Export
+
+Once benchmark_results/ is populated, run:
+
+bash analyze_benchmarks.sh
+
+This script:
+
+Prints a table like:
+
+Benchmark            Predictor       Branches     Mispreds     Accuracy   MPKI  
+--------------------------------------------------------------------------------  
+binary_search        LocalBP         ...  
+binary_search        TournamentBP    ...  
+...
+
+Prints average MPKI per predictor.
+
+Exports a CSV:
+
+benchmark_results/results.csv
+
+CSV columns:
+
+arch,predictor,benchmark,branches,mispredictions,instructions,ticks,accuracy,mpki
+
+arch is always X86.
+
+---
+
+## 6. Plotting and Visualization (X86)
+
+Dependencies:
+
+pip install pandas numpy matplotlib
+
+Main plotting script: plot_results.py
+
+Basic usage:
+
+python3 plot_results.py \
+  --dir benchmark_results \
+  --hello-dir m5out \
+  --output plots
+
+This expects:
+
+benchmark_results/results.csv  
+m5out/*/stats.txt
+
+The script generates PNGs in plots/:
+
+Per-benchmark comparisons:
+
+mpki_comparison_x86.png  
+accuracy_comparison_x86.png  
+mpki_heatmap_x86.png  
+
+Predictor-centric views:
+
+predictor_summary.png  
+execution_time_x86.png  
+overall_ranking_x86.png  
+summary_table.png  
+
+Benchmark-centric:
+
+benchmark_difficulty_x86.png  
+
+Radar visualization:
+
+predictor_radar_x86.png  
+
+Hello vs realistic comparisons:
+
+hello_vs_realistic_mpki_x86.png  
+hello_vs_realistic_accuracy_x86.png  
+
+These compare each predictor on hello-world vs realistic workloads.
+
+---
+
+## Optional: CPU-Configuration Comparison Mode
+
+If results are organized by CPU config, layout:
+
+benchmark_results/  
+  X86/  
+    O3_default/  
+      LocalBP/binary_search/stats.txt  
+      LocalBP/quicksort/stats.txt  
+      HybridPerceptronBP/quicksort/stats.txt  
+      ...  
+    O3_wide/  
+    O3_narrow/  
+    Minor_inorder/
+
+Run:
+
+python3 plot_results.py \
+  --dir benchmark_results \
+  --output plots_cpu \
+  --cpu-compare
+
+Generated images:
+
+cpu_comparison_mpki.png  
+cpu_comparison_accuracy.png  
+cpu_impact_heatmap.png  
+predictor_ranking_<cpu>.png

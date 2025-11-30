@@ -1,9 +1,11 @@
+#!/usr/bin/env bash
+
 echo "=============================================="
 echo "    BRANCH PREDICTOR COMPARISON RESULTS"
 echo "=============================================="
 echo ""
 
-for bp in perceptron local tournament ltage; do
+for bp in perceptron local tournament ltage hybrid; do
     echo "--- $bp ---"
     if [ -f "m5out/$bp/stats.txt" ]; then
         predicted=$(grep "branchPred.condPredicted " m5out/$bp/stats.txt | awk '{print $2}')

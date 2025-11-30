@@ -1131,18 +1131,61 @@ class MultiperspectivePerceptronTAGE8KB(MultiperspectivePerceptronTAGE):
     loop_predictor = MPP_LoopPredictor_8KB()
     statistical_corrector = MPP_StatisticalCorrector_8KB()
 
+
 # Add this class definition (after other predictor classes)
 
-class PerceptronLocalBP(BranchPredictor):
-    type = 'PerceptronLocalBP'
-    cxx_class = 'gem5::branch_prediction::PerceptronLocalBP'
-    cxx_header = 'cpu/pred/perceptron_local.hh'
 
-    perceptronTableSize = Param.Unsigned(4096,
-        "Number of perceptrons in the table (must be power of 2)")
-    localHistoryLength = Param.Unsigned(62,
-        "Length of local history in bits")
-    threshold = Param.Int(134,
-        "Training threshold")
+class PerceptronLocalBP(BranchPredictor):
+    type = "PerceptronLocalBP"
+    cxx_class = "gem5::branch_prediction::PerceptronLocalBP"
+    cxx_header = "cpu/pred/perceptron_local.hh"
+
+    perceptronTableSize = Param.Unsigned(
+        4096, "Number of perceptrons in the table (must be power of 2)"
+    )
+    localHistoryLength = Param.Unsigned(62, "Length of local history in bits")
+    threshold = Param.Int(134, "Training threshold")
+    weightMax = Param.Int(127, "Maximum weight value")
+    weightMin = Param.Int(-128, "Minimum weight value")
+
+
+class HybridPerceptronBP(BranchPredictor):
+    """
+    Hybrid Global-Local Perceptron Branch Predictor
+
+    Novel features:
+    1. Combines local history (per-branch patterns) with global history
+       (inter-branch correlations)
+    2. Adaptive chooser learns which predictor to trust per-branch
+    3. Dynamic threshold adjustment based on misprediction rate
+
+    For CSE 220 Class Project
+    """
+
+    type = "HybridPerceptronBP"
+    cxx_class = "gem5::branch_prediction::HybridPerceptronBP"
+    cxx_header = "cpu/pred/hybrid_perceptron.hh"
+
+    # Local predictor parameters
+    localTableSize = Param.Unsigned(
+        2048, "Number of local perceptrons (must be power of 2)"
+    )
+    localHistoryLength = Param.Unsigned(32, "Length of local history in bits")
+
+    # Global predictor parameters
+    globalTableSize = Param.Unsigned(
+        2048, "Number of global perceptrons (must be power of 2)"
+    )
+    globalHistoryLength = Param.Unsigned(
+        32, "Length of global history in bits"
+    )
+
+    # Hybrid/chooser parameters
+    chooserSize = Param.Unsigned(4096, "Size of the chooser table")
+
+    # Training parameters
+    threshold = Param.Int(
+        77, "Training threshold (formula: 1.93 * historyLength + 14)"
+    )
     weightMax = Param.Int(127, "Maximum weight value")
     weightMin = Param.Int(-128, "Minimum weight value")

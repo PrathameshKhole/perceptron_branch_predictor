@@ -1,4 +1,4 @@
-This file explains how to use gem5's updated testing infrastructure. Running
+<!-- This file explains how to use gem5's updated testing infrastructure. Running
 tests before submitting a patch is *incredibly important* so unexpected bugs
 don't creep into gem5.
 
@@ -245,4 +245,4 @@ For tests run via `./main.py` we split up the tests via the subdirectories in "t
 For example, all tests under "test/gem5/cpu_tests" are run as one job.
 Therefore tests added to existing directories are likely to be included, but modifications to the workflow files may be needed if new directories are added.
 
-We strongly recommend that when adding or ammending tests, that contributors check the ".github/workflows" files to ensure the tests they specify will be run as intended.
+We strongly recommend that when adding or ammending tests, that contributors check the ".github/workflows" files to ensure the tests they specify will be run as intended. -->

@@ -1,4 +1,4 @@
-This document serves as a guide to contributing to gem5.
+<!-- This document serves as a guide to contributing to gem5.
 The following subsections outline, in order, the steps involved in contributing
 to the gem5 project.
 
@@ -453,4 +453,4 @@ the last but with an incremented hotfix number (e.g., "v20.2.0.0" would
 transition to "v20.2.0.1").
 4. The hotfix branch will then be deleted.
 5. The gem5-dev and the gem5-user mailing lists shall be notified of this
-hotfix.
+hotfix. -->

@@ -1,4 +1,4 @@
-This file explains how to work with gem5's implementation of the kconfig
+<!-- This file explains how to work with gem5's implementation of the kconfig
 configuration system, very similar to what's used by the linux kernel. It talks
 about how to work with the Kconfig files themselves which define what user
 adjustable configuration parameters there are, and how they work and
@@ -111,4 +111,4 @@ automatically generated as part of the build. It uses the kconfiglib extension
 "osource" to optionally source a file called Kconfig in the base of each EXTRAS
 directory after it has sourced gem5's main Kconfig. If you want to add Kconfig
 options to your EXTRAS directory, you can create that file, and then rsource
-any additional internal Kconfig files as needed.
+any additional internal Kconfig files as needed. -->

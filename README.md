@@ -11,6 +11,39 @@ Predictors compared (X86):
 
 ---
 
+## 0. Clone and Basic Setup
+
+Clone this repository (with submodules), install Python packages, install gem5 build dependencies, and build the X86 binary:
+
+git clone https://github.com/PrathameshKhole/perceptron_branch_predictor.git --recursive
+cd perceptron_branch_predictor/
+
+# Python dependencies for plotting / scripts
+pip install -r requirements.txt
+pip install pydot
+
+# System dependencies for gem5 (Ubuntu/Debian)
+sudo apt install -y \
+  build-essential git m4 scons zlib1g zlib1g-dev \
+  libprotobuf-dev protobuf-compiler libprotoc-dev \
+  libgoogle-perftools-dev python3-dev python3-pybind11 \
+  libboost-all-dev pkg-config
+
+# Make sure Python's lib directory is visible to the linker
+export LD_LIBRARY_PATH=$(python3 -c "import sysconfig; print(sysconfig.get_config_var('LIBDIR'))"):$LD_LIBRARY_PATH
+
+# Build gem5 (X86 only)
+scons build/X86/gem5.opt -j"$(nproc)"
+
+# Run simple test with hello world to check working of build
+./build/X86/gem5.opt \
+  configs/deprecated/example/se.py \
+  --cpu-type=O3CPU --caches --l2cache \
+  --bp-type=PerceptronLocalBP \
+  -c tests/test-progs/hello/bin/x86/linux/hello
+
+---
+
 ## 1. Code Added
 
 Predictor C++ files:

@@ -11,7 +11,7 @@ Predictors compared (X86):
 
 ---
 
-## 0. Clone and Basic Setup
+## 1. Clone and Basic Setup
 
 Clone this repository (with submodules), install Python packages, install gem5 build dependencies, and build the X86 binary:
 
@@ -44,7 +44,7 @@ scons build/X86/gem5.opt -j"$(nproc)"
 
 ---
 
-## 1. Code Added
+## 2. Code Added
 
 Predictor C++ files:
 - src/cpu/pred/perceptron_local.hh
@@ -66,7 +66,7 @@ SCons configuration:
 
 ---
 
-## 2. Building gem5 for X86
+## 3. Building gem5 for X86
 
 From the gem5 root:
 
@@ -82,7 +82,7 @@ HybridPerceptronBP
 
 ---
 
-## 3. Simple Tests Using baseline Hello-World
+## 4. Simple Tests Using baseline Hello-World
 
 Runs use:  
 tests/test-progs/hello/bin/x86/linux/hello
@@ -122,7 +122,7 @@ m5out/hybrid/stats.txt
 
 ---
 
-## 4. Plotting and Visualization
+## 5. Plotting and Visualization
 
 Dependencies:
 
